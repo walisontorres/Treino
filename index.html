@@ -3,87 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Treino Flow - Evolução de Carga</title>
+    <title>TreinoFlow - Dashboard Inteligente</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { background-color: #F4F7F6; } /* Tom White Gelo */
-        .card { background-color: #FFFFFF; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        body { background-color: #F4F7F6; color: #334155; }
+        .card { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
+        .sidebar-item { cursor: pointer; transition: all 0.2s; border-left: 4px solid transparent; }
+        .sidebar-item.active { background-color: #EFF6FF; border-left-color: #2563EB; color: #1E40AF; font-weight: bold; }
+        .btn-plus { background: #2563EB; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; transition: transform 0.2s; }
+        .btn-plus:active { transform: scale(0.9); }
     </style>
 </head>
-<body class="p-4 md:p-8 font-sans text-slate-700">
+<body class="p-2 md:p-8">
 
-    <div class="max-w-5xl mx-auto">
-        <header class="mb-8 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-slate-800">Treino<span class="text-blue-600">Flow</span></h1>
-            <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition">Novo Registro</button>
-        </header>
+    <div class="max-w-7xl mx-auto grid lg:grid-cols-12 gap-6">
+        
+        <aside class="lg:col-span-3 space-y-4">
+            <div class="card p-5">
+                <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Meus Exercícios</h2>
+                <div id="exerciseList" class="space-y-1">
+                    </div>
+                <div class="mt-4 pt-4 border-t border-slate-100">
+                    <input type="text" id="newExerciseName" placeholder="Novo exercício..." class="w-full text-sm p-2 border rounded-md outline-none focus:border-blue-500">
+                    <button onclick="adicionarExercicioLista()" class="w-full mt-2 text-xs font-bold text-blue-600">+ ADICIONAR À LISTA</button>
+                </div>
+            </div>
+        </aside>
 
-        <div class="grid md:grid-cols-3 gap-6">
-            <div class="card p-6 md:col-span-1 border-t-4 border-blue-500">
-                <h2 class="text-lg font-semibold mb-4 text-slate-800">Registrar Carga</h2>
-                <form id="workoutForm" class="space-y-4">
+        <main class="lg:col-span-6 space-y-6">
+            <div class="card p-8 text-center border-2 border-blue-50">
+                <h2 id="selectedExerciseTitle" class="text-2xl font-black text-slate-800 mb-6 uppercase tracking-tight italic">Selecione um exercício</h2>
+                
+                <div class="grid grid-cols-3 gap-4 mb-8">
                     <div>
-                        <label class="block text-sm font-medium mb-1">Exercício</label>
-                        <input type="text" id="exercise" placeholder="Ex: Supino Reto" class="w-full p-2 border border-slate-200 rounded-md focus:ring-2 focus:ring-blue-400 outline-none">
+                        <span class="block text-xs font-bold text-slate-400 mb-2 uppercase">Séries</span>
+                        <input type="number" id="sets" value="4" class="w-full text-2xl font-bold text-center p-3 bg-slate-50 rounded-xl border-none">
                     </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label class="block text-sm font-medium mb-1">Carga (kg)</label>
-                            <input type="number" id="weight" class="w-full p-2 border border-slate-200 rounded-md">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-1">Data</label>
-                            <input type="date" id="date" class="w-full p-2 border border-slate-200 rounded-md text-sm">
-                        </div>
+                    <div>
+                        <span class="block text-xs font-bold text-slate-400 mb-2 uppercase">Reps</span>
+                        <input type="number" id="reps" value="10" class="w-full text-2xl font-bold text-center p-3 bg-slate-50 rounded-xl border-none">
                     </div>
-                    <button type="submit" class="w-full bg-slate-800 text-white py-2 rounded-md hover:bg-slate-900 transition mt-2">Salvar Entrada</button>
-                </form>
+                    <div>
+                        <span class="block text-xs font-bold text-slate-400 mb-2 uppercase">Peso (kg)</span>
+                        <input type="number" id="weight" value="20" class="w-full text-2xl font-bold text-center p-3 bg-blue-600 text-white rounded-xl border-none shadow-lg shadow-blue-200">
+                    </div>
+                </div>
+
+                <div class="flex flex-col items-center gap-2">
+                    <button onclick="registrarTreino()" class="btn-plus shadow-blue-400 shadow-lg">+</button>
+                    <span class="text-xs font-bold text-blue-600 uppercase mt-2">Registrar Treino</span>
+                </div>
             </div>
 
-            <div class="card p-6 md:col-span-2">
+            <div class="card p-6">
                 <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-lg font-semibold text-slate-800">Evolução de Intensidade</h2>
-                    <select class="text-sm border-none bg-slate-100 rounded p-1 outline-none text-blue-600 font-medium">
-                        <option>Últimos 30 dias</option>
-                        <option>Este ano</option>
-                    </select>
+                    <h2 class="font-bold text-slate-800">Progresso de Volume</h2>
+                    <div id="chartLegend" class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full uppercase">Global</div>
                 </div>
                 <div class="h-64">
                     <canvas id="evolutionChart"></canvas>
                 </div>
             </div>
-        </div>
+        </main>
+
+        <section class="lg:col-span-3">
+            <div class="card overflow-hidden h-full">
+                <div class="p-4 bg-slate-800 text-white text-xs font-bold uppercase tracking-widest">
+                    Histórico do Dia
+                </div>
+                <div id="historyTable" class="divide-y divide-slate-50 max-h-[600px] overflow-y-auto">
+                    </div>
+            </div>
+        </section>
+
     </div>
 
     <script>
-        // Configuração do Gráfico
-        const ctx = document.getElementById('evolutionChart').getContext('2d');
-        const chart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['01/03', '05/03', '10/03', '15/03', '20/03', '25/03'],
-                datasets: [{
-                    label: 'Volume de Carga (kg)',
-                    data: [80, 85, 82, 90, 95, 100],
-                    borderColor: '#2563eb', // Azul
-                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                    fill: true,
-                    tension: 0.4,
-                    borderWidth: 3,
-                    pointRadius: 4,
-                    pointBackgroundColor: '#2563eb'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: false, grid: { color: '#e2e8f0' } },
-                    x: { grid: { display: false } }
-                }
+        // Dados iniciais
+        let exerciciosDisponiveis = JSON.parse(localStorage.getItem('exercicios_lista')) || ['Supino Reto', 'Agachamento', 'Levantamento Terra', 'Desenvolvimento'];
+        let treinos = JSON.parse(localStorage.getItem('treinos_data')) || [];
+        let selecionado = "";
+        let chart;
+
+        function init() {
+            renderSidebar();
+            renderHistory();
+            renderChart();
+        }
+
+        function renderSidebar() {
+            const list = document.getElementById('exerciseList');
+            list.innerHTML = exerciciosDisponiveis.map(ex => `
+                <div onclick="selecionarExercicio('${ex}')" class="sidebar-item p-3 text-sm rounded-lg hover:bg-slate-50 ${selecionado === ex ? 'active' : ''}">
+                    ${ex}
+                </div>
+            `).join('');
+        }
+
+        function selecionarExercicio(ex) {
+            selecionado = ex;
+            document.getElementById('selectedExerciseTitle').innerText = ex;
+            renderSidebar();
+            renderChart(); // Atualiza gráfico para mostrar progresso desse exercício específico
+            document.getElementById('chartLegend').innerText = ex;
+        }
+
+        function adicionarExercicioLista() {
+            const input = document.getElementById('newExerciseName');
+            if(input.value) {
+                exerciciosDisponiveis.push(input.value);
+                localStorage.setItem('exercicios_lista', JSON.stringify(exerciciosDisponiveis));
+                input.value = "";
+                renderSidebar();
             }
-        });
+        }
+
+        function registrarTreino() {
+            if(!selecionado) return alert("Selecione um exercício na esquerda!");
+            
+            const novo = {
+                id: Date.now(),
+                exercise: selecionado,
+                sets: parseInt(document.getElementById('sets').value),
+                reps: parseInt(document.getElementById('reps').value),
+                weight: parseFloat(document.getElementById('weight').value),
+                date: new Date().toISOString().split('T')[0]
+            };
+
+            treinos.push(novo);
+            localStorage.setItem('treinos_data', JSON.stringify(treinos));
+            renderHistory();
+            renderChart();
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('historyTable');
+            const hoje = new Date().toISOString().split('T')[0];
+            const treinosHoje = treinos.filter(t => t.date === hoje).reverse();
+
+            container.innerHTML = treinosHoje.map(t => `
+                <div class="p-4 flex justify-between items-center hover:bg-slate-50">
+                    <div>
+                        <div class="font-bold text-slate-800 text-sm">${t.exercise}</div>
+                        <div class="text-xs text-slate-400">${t.sets}x${t.reps} — ${t.weight}kg</div>
+                    </div>
+                    <div class="text-blue-600 font-black text-sm">${t.sets * t.reps * t.weight}kg</div>
+                </div>
+            `).join('');
+        }
+
+        function renderChart() {
+            const ctx = document.getElementById('evolutionChart').getContext('2d');
+            
+            // Filtra dados para o gráfico (se houver selecionado, mostra progresso dele, se não, mostra global)
+            const dadosFiltrados = selecionado 
+                ? treinos.filter(t => t.exercise === selecionado)
+                : treinos;
+
+            const agrupado = dadosFiltrados.reduce((acc, t) => {
+                acc[t.date] = (acc[t.date] || 0) + (t.sets * t.reps * t.weight);
+                return acc;
+            }, {});
+
+            const labels = Object.keys(agrupado).sort();
+            const valores = labels.map(l => agrupado[l]);
+
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels.map(l => l.split('-').reverse().slice(0,2).join('/')),
+                    datasets: [{
+                        data: valores,
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 4,
+                        pointRadius: 6,
+                        pointBackgroundColor: '#fff'
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+        }
+
+        init();
     </script>
 </body>
+</html>
