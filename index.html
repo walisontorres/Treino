@@ -6,94 +6,95 @@
     <title>TreinoFlow - Elite Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         body { background-color: #F8FAFC; color: #1E293B; font-family: 'Inter', sans-serif; }
-        .bg-gelo { background-color: #F1F5F9; }
-        .card { background: white; border-radius: 20px; border: 1px solid #E2E8F0; transition: transform 0.2s; }
-        .sidebar-item { cursor: pointer; border-radius: 12px; transition: 0.2s; }
-        .sidebar-item.active { background: #2563EB; color: white; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3); }
-        #loginOverlay { backdrop-filter: blur(8px); }
+        .card { background: white; border-radius: 24px; border: 1px solid #E2E8F0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
+        .sidebar-item { cursor: pointer; border-radius: 12px; transition: all 0.2s; border-left: 4px solid transparent; }
+        .sidebar-item.active { background: #EBF2FF; border-left-color: #2563EB; color: #2563EB; font-weight: bold; }
+        #loginOverlay { backdrop-filter: blur(12px); }
+        input[type="number"]::-webkit-inner-spin-button { display: none; }
     </style>
 </head>
 <body class="min-h-screen">
 
     <div id="loginOverlay" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
-        <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full text-center">
-            <h1 class="text-3xl font-black text-slate-800 mb-2">Treino<span class="text-blue-600">Flow</span></h1>
-            <p class="text-slate-500 mb-8 text-sm">Insira seu código ou gere um novo acesso.</p>
+        <div class="bg-white p-8 rounded-[32px] shadow-2xl max-w-md w-full text-center">
+            <h1 class="text-4xl font-black text-slate-800 mb-2 tracking-tighter">Treino<span class="text-blue-600">Flow</span></h1>
+            <p class="text-slate-500 mb-8 text-sm font-medium">Insira seu código de acesso</p>
             
-            <input type="text" id="userCodeInput" placeholder="Ex: FLOW-XXXX" class="w-full p-4 bg-slate-100 rounded-xl border-2 border-transparent focus:border-blue-500 outline-none text-center font-mono text-xl mb-4 uppercase">
+            <input type="text" id="userCodeInput" placeholder="EX: FLOW-A1B2" class="w-full p-5 bg-slate-100 rounded-2xl border-2 border-transparent focus:border-blue-500 outline-none text-center font-mono text-2xl mb-4 uppercase tracking-widest transition-all">
             
             <div class="flex flex-col gap-3">
-                <button onclick="login()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition shadow-lg shadow-blue-200">ENTRAR</button>
-                <button onclick="registrarNovo()" class="text-blue-600 font-bold text-sm hover:underline">NÃO TENHO CÓDIGO (GERAR NOVO)</button>
+                <button onclick="login()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-5 rounded-2xl transition shadow-xl shadow-blue-200 active:scale-95">ENTRAR NO DASHBOARD</button>
+                <button onclick="registrarNovo()" class="text-slate-400 font-bold text-xs hover:text-blue-600 transition tracking-widest">NÃO TENHO CÓDIGO (GERAR NOVO)</button>
             </div>
         </div>
     </div>
 
-    <div id="dashboard" class="hidden p-4 md:p-8">
-        <header class="max-w-7xl mx-auto flex justify-between items-center mb-8">
-            <div class="flex items-center gap-4">
-                <div class="bg-blue-600 text-white p-2 rounded-lg font-bold">TF</div>
-                <h1 class="text-xl font-black tracking-tight uppercase">Dashboard <span id="displayUserCode" class="text-blue-600 ml-2 font-mono"></span></h1>
+    <div id="dashboard" class="hidden opacity-0 transition-opacity duration-500 p-4 md:p-8">
+        <header class="max-w-7xl mx-auto flex justify-between items-center mb-10">
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-600 text-white w-10 h-10 flex items-center justify-center rounded-xl font-black shadow-lg shadow-blue-200">TF</div>
+                <h1 class="text-xl font-black tracking-tight uppercase">User: <span id="displayUserCode" class="text-blue-600 font-mono"></span></h1>
             </div>
-            <button onclick="logout()" class="text-slate-400 hover:text-red-500 text-sm font-bold uppercase tracking-widest">Sair</button>
+            <button onclick="logout()" class="text-slate-400 hover:text-red-500 text-xs font-black uppercase tracking-widest transition">Sair</button>
         </header>
 
         <div class="max-w-7xl mx-auto grid lg:grid-cols-12 gap-8">
             
             <aside class="lg:col-span-3 space-y-4">
                 <div class="card p-6">
-                    <h3 class="text-xs font-black text-slate-400 uppercase mb-4 tracking-widest">Seus Exercícios</h3>
-                    <div id="exerciseList" class="space-y-2"></div>
-                    <div class="mt-6">
-                        <input type="text" id="addExInput" placeholder="Nome do exercício" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm mb-2 outline-none focus:border-blue-400">
-                        <button onclick="addExercise()" class="w-full text-blue-600 font-bold text-xs py-2 hover:bg-blue-50 rounded-lg transition">+ ADICIONAR NOVO</button>
+                    <h3 class="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-[0.2em]">Sua Biblioteca</h3>
+                    <div id="exerciseList" class="space-y-1"></div>
+                    <div class="mt-6 pt-6 border-t border-slate-50">
+                        <input type="text" id="addExInput" placeholder="Novo exercício..." class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm mb-2 outline-none focus:border-blue-400">
+                        <button onclick="addExercise()" class="w-full text-blue-600 font-black text-[10px] py-2 hover:bg-blue-50 rounded-lg transition uppercase tracking-widest">+ Adicionar</button>
                     </div>
                 </div>
             </aside>
 
-            <main class="lg:col-span-6 space-y-6">
-                <div class="card p-8 bg-white border-b-8 border-blue-600 shadow-xl relative overflow-hidden">
-                    <div class="absolute top-0 right-0 p-4 opacity-5 font-black text-6xl italic" id="bgText">FLOW</div>
+            <main class="lg:col-span-6 space-y-8">
+                <div class="card p-8 border-b-[8px] border-blue-600 relative overflow-hidden">
                     <h2 id="activeExName" class="text-3xl font-black text-slate-800 mb-8 italic uppercase tracking-tighter">Selecione um Exercício</h2>
                     
-                    <div class="grid grid-cols-3 gap-6 mb-8">
-                        <div class="text-center">
+                    <div class="grid grid-cols-3 gap-4 mb-8">
+                        <div class="text-center p-4 bg-slate-50 rounded-3xl">
                             <span class="block text-[10px] font-black text-slate-400 uppercase mb-2">Séries</span>
-                            <input type="number" id="inputSets" value="4" class="w-full bg-slate-100 rounded-2xl p-4 text-2xl font-black text-center border-none">
+                            <input type="number" id="inputSets" value="4" class="w-full bg-transparent text-2xl font-black text-center outline-none">
                         </div>
-                        <div class="text-center">
+                        <div class="text-center p-4 bg-slate-50 rounded-3xl">
                             <span class="block text-[10px] font-black text-slate-400 uppercase mb-2">Reps</span>
-                            <input type="number" id="inputReps" value="12" class="w-full bg-slate-100 rounded-2xl p-4 text-2xl font-black text-center border-none">
+                            <input type="number" id="inputReps" value="10" class="w-full bg-transparent text-2xl font-black text-center outline-none">
                         </div>
-                        <div class="text-center">
-                            <span class="block text-[10px] font-black text-slate-400 uppercase mb-2">Carga (kg)</span>
-                            <input type="number" id="inputWeight" value="0" class="w-full bg-blue-600 text-white rounded-2xl p-4 text-2xl font-black text-center border-none shadow-lg shadow-blue-300">
+                        <div class="text-center p-4 bg-blue-600 rounded-3xl shadow-xl shadow-blue-100">
+                            <span class="block text-[10px] font-black text-blue-200 uppercase mb-2">Peso (kg)</span>
+                            <input type="number" id="inputWeight" value="20" class="w-full bg-transparent text-white text-2xl font-black text-center outline-none">
                         </div>
                     </div>
                     
-                    <div class="flex flex-col items-center">
-                        <button onclick="saveWorkout()" class="bg-slate-900 text-white w-16 h-16 rounded-full flex items-center justify-center text-3xl shadow-xl hover:scale-110 active:scale-95 transition-all">
-                            +
+                    <div class="flex justify-center">
+                        <button onclick="saveWorkout()" class="bg-slate-900 text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-2xl hover:bg-blue-600 transition-all flex items-center gap-2">
+                            <span>+</span> Registrar Treino
                         </button>
-                        <p class="mt-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Registrar Treino</p>
                     </div>
                 </div>
 
-                <div class="card p-6 min-h-[350px]">
-                    <h3 class="font-black text-slate-800 mb-6 flex items-center justify-between">
-                        EVOLUÇÃO DE VOLUME
-                        <span id="chartLabel" class="text-[10px] bg-blue-100 text-blue-700 px-3 py-1 rounded-full uppercase">Global</span>
-                    </h3>
-                    <canvas id="proChart"></canvas>
+                <div class="card p-8 min-h-[400px]">
+                    <div class="flex justify-between items-center mb-8">
+                        <h3 class="font-black text-slate-800 text-sm tracking-tight uppercase">Evolução de Volume</h3>
+                        <span id="chartLabel" class="text-[10px] font-black bg-blue-100 text-blue-600 px-3 py-1 rounded-full uppercase">Global</span>
+                    </div>
+                    <div class="h-[280px]">
+                        <canvas id="proChart"></canvas>
+                    </div>
                 </div>
             </main>
 
             <section class="lg:col-span-3">
-                <div class="card h-full flex flex-col">
-                    <div class="p-6 border-b border-slate-100 flex justify-between items-center">
-                        <h3 class="font-black text-xs uppercase tracking-widest">Sessão de Hoje</h3>
+                <div class="card h-full flex flex-col overflow-hidden">
+                    <div class="p-6 border-b border-slate-50 bg-slate-50/50">
+                        <h3 class="font-black text-[10px] text-slate-400 uppercase tracking-widest">Sessão de Hoje</h3>
                     </div>
                     <div id="todayHistory" class="flex-grow p-4 space-y-3 overflow-y-auto"></div>
                 </div>
@@ -107,12 +108,15 @@
         let activeEx = "";
         let myChart;
 
-        // --- SISTEMA DE ACESSO ---
+        // 1. ACESSO
         function registrarNovo() {
             const code = 'FLOW-' + Math.random().toString(36).substr(2, 4).toUpperCase();
-            localStorage.setItem(code, JSON.stringify({ exercises: ['Supino', 'Agachamento'], workouts: [] }));
+            localStorage.setItem(code, JSON.stringify({ 
+                exercises: ['Supino Reto', 'Agachamento', 'Remada Curvada'], 
+                workouts: [] 
+            }));
             document.getElementById('userCodeInput').value = code;
-            alert("SEU NOVO CÓDIGO É: " + code + "\nGuarde-o para acessar seus dados!");
+            alert("CÓDIGO GERADO: " + code + "\nSalve este código para não perder seus dados!");
         }
 
         function login() {
@@ -122,17 +126,19 @@
                 currentUser = code;
                 userData = JSON.parse(stored);
                 document.getElementById('loginOverlay').classList.add('hidden');
-                document.getElementById('dashboard').classList.remove('hidden');
+                const dash = document.getElementById('dashboard');
+                dash.classList.remove('hidden');
+                setTimeout(() => dash.classList.add('opacity-100'), 50);
                 document.getElementById('displayUserCode').innerText = code;
                 renderAll();
             } else {
-                alert("Código não encontrado!");
+                alert("Código inválido ou não encontrado.");
             }
         }
 
         function logout() { location.reload(); }
 
-        // --- LÓGICA DE TREINO ---
+        // 2. CORE LOGIC
         function renderAll() {
             renderSidebar();
             renderHistory();
@@ -143,8 +149,8 @@
         function renderSidebar() {
             const list = document.getElementById('exerciseList');
             list.innerHTML = userData.exercises.map(ex => `
-                <div onclick="setActive('${ex}')" class="sidebar-item p-4 text-sm font-bold flex justify-between items-center ${activeEx === ex ? 'active' : 'hover:bg-slate-50'}">
-                    ${ex} <span>→</span>
+                <div onclick="setActive('${ex}')" class="sidebar-item p-4 text-xs font-black uppercase tracking-tight ${activeEx === ex ? 'active' : 'text-slate-500 hover:bg-slate-50'}">
+                    ${ex}
                 </div>
             `).join('');
         }
@@ -152,7 +158,6 @@
         function setActive(ex) {
             activeEx = ex;
             document.getElementById('activeExName').innerText = ex;
-            document.getElementById('bgText').innerText = ex.substring(0,4);
             renderSidebar();
             updateChart();
         }
@@ -167,7 +172,7 @@
         }
 
         function saveWorkout() {
-            if(!activeEx) return alert("Selecione um exercício primeiro!");
+            if(!activeEx) return alert("Selecione um exercício na lista!");
             const entry = {
                 ex: activeEx,
                 s: parseInt(document.getElementById('inputSets').value),
@@ -185,21 +190,21 @@
             const filtered = userData.workouts.filter(w => w.d === today).reverse();
             
             list.innerHTML = filtered.map(w => `
-                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                    <div class="text-[10px] font-black text-blue-600 uppercase mb-1">${w.ex}</div>
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 animate-in fade-in duration-300">
+                    <div class="text-[9px] font-black text-blue-600 uppercase mb-1 tracking-widest">${w.ex}</div>
                     <div class="flex justify-between items-end">
-                        <span class="text-xs text-slate-500 font-bold">${w.s}x${w.r} @ ${w.w}kg</span>
-                        <span class="font-black text-slate-800">${w.s * w.r * w.w}kg</span>
+                        <span class="text-xs text-slate-400 font-bold">${w.s}x${w.r} @ ${w.w}kg</span>
+                        <span class="font-black text-slate-800 text-sm">${(w.s * w.r * w.w).toLocaleString()} <small class="text-[8px] text-slate-400">KG</small></span>
                     </div>
                 </div>
             `).join('');
         }
 
+        // 3. GRÁFICO (REVISADO)
         function updateChart() {
             const ctx = document.getElementById('proChart').getContext('2d');
             const dataToShow = activeEx ? userData.workouts.filter(w => w.ex === activeEx) : userData.workouts;
             
-            // Agrupar volume por data
             const grouped = dataToShow.reduce((acc, w) => {
                 acc[w.d] = (acc[w.d] || 0) + (w.s * w.r * w.w);
                 return acc;
@@ -210,8 +215,8 @@
 
             if(myChart) myChart.destroy();
             
-            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-            gradient.addColorStop(0, 'rgba(37, 99, 235, 0.2)');
+            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, 'rgba(37, 99, 235, 0.15)');
             gradient.addColorStop(1, 'rgba(37, 99, 235, 0)');
 
             myChart = new Chart(ctx, {
@@ -219,13 +224,12 @@
                 data: {
                     labels: labels.map(l => l.split('-').reverse().slice(0,2).join('/')),
                     datasets: [{
-                        label: 'Volume Total',
                         data: values,
                         borderColor: '#2563EB',
-                        borderWidth: 5,
+                        borderWidth: 4,
                         pointBackgroundColor: '#fff',
                         pointBorderColor: '#2563EB',
-                        pointRadius: 6,
+                        pointRadius: values.length === 1 ? 8 : 4,
                         pointHoverRadius: 8,
                         fill: true,
                         backgroundColor: gradient,
@@ -237,12 +241,20 @@
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        y: { beginAtZero: true, grid: { color: '#F1F5F9' }, ticks: { font: { weight: 'bold' } } },
-                        x: { grid: { display: false }, ticks: { font: { weight: 'bold' } } }
+                        y: { 
+                            beginAtZero: false, 
+                            grace: '15%',
+                            grid: { borderDash: [5, 5], color: '#F1F5F9' },
+                            ticks: { 
+                                font: { size: 9, weight: 'bold' },
+                                callback: value => value >= 1000 ? (value/1000).toFixed(1) + 'k' : value
+                            }
+                        },
+                        x: { grid: { display: false }, ticks: { font: { size: 9, weight: 'bold' } } }
                     }
                 }
             });
-            document.getElementById('chartLabel').innerText = activeEx || "GLOBAL";
+            document.getElementById('chartLabel').innerText = activeEx || "DASHBOARD GLOBAL";
         }
     </script>
 </body>
